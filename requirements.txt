@@ -1,0 +1,7 @@
+joblib
+pandas
+opencv-python
+numpy
+dlib
+spiga
+pycatch22

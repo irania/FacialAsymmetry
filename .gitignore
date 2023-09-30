@@ -1,0 +1,6 @@
+data/
+venv/
+*.csv
+*.mp4
+*.jpg
+*.pyc
