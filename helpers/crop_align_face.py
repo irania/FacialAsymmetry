@@ -5,8 +5,6 @@ import numpy as np
 import numpy as np
 import cv2
 import pandas as pd
-import sys
-sys.path.append('d:/Codes/Python/VideoFaceAnalysis')
 from helpers.face import Face
 from helpers.image_reader import read_image
 

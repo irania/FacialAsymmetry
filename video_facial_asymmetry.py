@@ -1,7 +1,10 @@
-#Align and crop face
+# This file contains the main function for the video facial asymmetry analysis.
 import joblib
+import argparse
+import glob
 import numpy as np
 import os
+import logging
 import pandas as pd
 from helpers.crop_align_face import crop_align_face_single_video
 from helpers.face import Face
@@ -11,10 +14,7 @@ from preprocessors.time_series_features import df_to_signal
 from preprocessors.asymmetry_features import asymmetry_feature_extract
 
 
-
-# Main directory containing the video files
-video_location_test= f'./data/v1.mp4'
-root_directory = f'./data/'           
+         
 
 def load_data_from_single_csv(file_path):
     # Read the CSV file
@@ -59,7 +59,6 @@ def extract_distances(video_name, aligned_face_destination, image_files, csv_nam
         df.to_csv(csv_name, index=False)
 
 
-
 def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder,output_feature_folder,output_signal_folder):
     #extract video name
     video_name= video_loc.split('/')[-1].split('.')[0]
@@ -99,22 +98,42 @@ def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder
     return predictions, probabilities
 
 
+logging.basicConfig(level=logging.INFO)
+
+def ensure_directory_exists(directory):
+    #Ensure that a given directory exists.
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+
+def process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder):
+    #Function to process a single video.
+    try:
+        predictions, probabilities = asymmetry_analyze(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)
+        logging.info(f"Video: {video_path} - Predictions: {predictions}, Probabilities: {probabilities}")
+    except Exception as e:
+        logging.error(f"Error processing video {video_path}: {e}")
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Analyze video facial asymmetry.")
+    parser.add_argument("video_directory", help="Directory containing the video files.")
+    # Example of adding another argument
+    parser.add_argument("--output_directory", default='./data/', help="Output directory for the processed data.")
+    args = parser.parse_args()
+
+    videos = glob.glob(os.path.join(args.video_directory, "*.mp4"))
+
+    root_directory = args.output_directory
     aligned_face_destination = os.path.join(root_directory,'aligned')
     output_distances_folder = os.path.join(root_directory,'csv-distance')
     output_feature_folder = os.path.join(root_directory,'csv-features')
     output_signal_folder = os.path.join(root_directory, 'csv-signal/')
 
-    if not os.path.exists(aligned_face_destination):
-            os.mkdir(aligned_face_destination)
-            
-    if not os.path.exists(output_distances_folder):
-            os.mkdir(output_distances_folder)
-            
-    if not os.path.exists(output_feature_folder):
-            os.mkdir(output_feature_folder)
-            
-    if not os.path.exists(output_signal_folder):
-            os.mkdir(output_signal_folder)
-    predictions, probabilities = asymmetry_analyze(video_location_test,aligned_face_destination,output_distances_folder,output_feature_folder,output_signal_folder)
-    print(predictions, probabilities)
+    # Using the helper function to ensure directories exist
+    ensure_directory_exists(root_directory)
+    ensure_directory_exists(aligned_face_destination)
+    ensure_directory_exists(output_distances_folder)
+    ensure_directory_exists(output_feature_folder)
+    ensure_directory_exists(output_signal_folder)
+    
+    for video_path in videos:
+        process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)

@@ -1,5 +1,7 @@
 data/
 venv/
+OpenFace_2.2.0/
+SPIGA/
 *.csv
 *.mp4
 *.jpg
