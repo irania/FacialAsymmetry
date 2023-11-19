@@ -59,35 +59,16 @@ def extract_distances(video_name, aligned_face_destination, image_files, csv_nam
         df.to_csv(csv_name, index=False)
 
 
-def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder,output_feature_folder,output_signal_folder):
-    #extract video name
-    video_name= video_loc.split('/')[-1].split('.')[0]
-    video_file= video_loc.split('/')[-1]
-    video_loc = '/'.join(video_loc.split('/')[0:-1])
-    #step 1: crop and align face.
-    crop_align_face_single_video(video_file, video_loc, aligned_face_destination)
-    aligned_face_destination = os.path.join(aligned_face_destination, video_name)
+def asymmetry_analyze(csv_name):
 
-    #step 2: calculate asymmetry
-    image_files = [f for f in os.listdir(aligned_face_destination) if f.endswith(('.png', '.jpg', '.jpeg'))]  # Assuming these extensions, adjust as needed
-        
-    csv_name = f"{video_name}-output.csv"
-    csv_file = f"{output_distances_folder}/{csv_name}"  # Naming CSV file according to the sub-directory name
-    #if not os.path.exists(csv_file):
-        #extract_distances(video_name, aligned_face_destination, image_files, csv_file)
-        
-    #step 3: extract features
-    df = asymmetry_feature_extract(output_feature_folder, output_distances_folder, csv_name)
-    df_to_signal(df,output_signal_folder, csv_name,'test')
-        
     #step 4: predict
-    file_path = f'{output_signal_folder}/signal_test_{csv_name}'
+    file_path = f"{csv_name}"  # Naming CSV file according to the sub-directory name
     data = load_data_from_single_csv(file_path)
 
     # Load model
-    loaded_clf = joblib.load('models/asymmetry_model.pkl')
+    loaded_clf = joblib.load('models/asymmetry_model_v2.pkl')
     # Load selected features
-    selected_features = joblib.load('models/selected_features.pkl')
+    selected_features = joblib.load('models/selected_features_v2.pkl')
 
     # Filter the prediction data to only include the features the model was trained on
     filtered_data = data[selected_features]
@@ -105,35 +86,45 @@ def ensure_directory_exists(directory):
     if not os.path.exists(directory):
         os.mkdir(directory)
 
-def process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder):
+def process_video(video_path, output_signal_folder):
     #Function to process a single video.
     try:
-        predictions, probabilities = asymmetry_analyze(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)
+        predictions, probabilities = asymmetry_analyze(video_path)
         logging.info(f"Video: {video_path} - Predictions: {predictions}, Probabilities: {probabilities}")
+        return predictions, probabilities
     except Exception as e:
         logging.error(f"Error processing video {video_path}: {e}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Analyze video facial asymmetry.")
-    parser.add_argument("video_directory", help="Directory containing the video files.")
     # Example of adding another argument
-    parser.add_argument("--output_directory", default='./data/', help="Output directory for the processed data.")
+    parser.add_argument("--output_directory", default='./data-UBC/', help="Output directory for the processed data.")
     args = parser.parse_args()
 
-    videos = glob.glob(os.path.join(args.video_directory, "*.mp4"))
+    
 
     root_directory = args.output_directory
-    aligned_face_destination = os.path.join(root_directory,'aligned')
-    output_distances_folder = os.path.join(root_directory,'csv-distance')
-    output_feature_folder = os.path.join(root_directory,'csv-features')
+    output_distances_folder = os.path.join(root_directory, 'csv-distance/')
+    output_feature_folder = os.path.join(root_directory, 'csv-features/')
     output_signal_folder = os.path.join(root_directory, 'csv-signal/')
-
+    csvs = glob.glob(os.path.join(output_distances_folder, "*.csv"))
+    
+    #step 3: extract features
+    csv_filenames = [os.path.basename(file) for file in csvs]
+    for csv in csv_filenames:
+        df = asymmetry_feature_extract(output_feature_folder, output_distances_folder, csv)
+    
+    csvs = glob.glob(os.path.join(output_signal_folder, "*.csv"))
     # Using the helper function to ensure directories exist
     ensure_directory_exists(root_directory)
-    ensure_directory_exists(aligned_face_destination)
-    ensure_directory_exists(output_distances_folder)
-    ensure_directory_exists(output_feature_folder)
     ensure_directory_exists(output_signal_folder)
     
-    for video_path in videos:
-        process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)
+    sum=0
+    dw=[]
+    for csv in csvs:
+        predictions, probabilities =process_video(csv, output_signal_folder)
+        sum+=predictions[0]
+        if predictions[0]==0:
+            dw.append(csv)    
+    print(sum)
+    print(dw)

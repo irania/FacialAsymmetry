@@ -1,7 +1,33 @@
 import os
 import numpy as np
 import pandas as pd
+import re
 
+# Define a function to extract the number from the image name
+def extract_number(image_name):
+    match = re.search(r'frame_(\d+).jpg', image_name)
+    if match:
+        return int(match.group(1))
+    return None
+
+def sort_df(df):
+    # Create a new column with the extracted numbers
+    df['ImageNumber'] = df['Image Name'].apply(extract_number)
+
+    # Sort the dataframe based on the 'ImageNumber' column
+    df_sorted = df.sort_values(by='ImageNumber')
+
+    # Drop the 'ImageNumber' column if you don't need it anymore
+    df_sorted = df_sorted.drop('ImageNumber', axis=1)
+
+    # Reset index if you want it in proper order after sorting
+    df_sorted = df_sorted.reset_index(drop=True)
+    return df_sorted
+
+def read_csv_file_sort(file_name):
+    df = pd.read_csv(file_name)
+    df = sort_df(df)
+    return df
 
 def read_csv_file(file_name):
     df = pd.read_csv(file_name)
@@ -10,7 +36,7 @@ def read_csv_file(file_name):
 
 def asymmetry_feature_extract(output_folder, input_folder, filename):
     input_file = os.path.join(input_folder, filename)
-    df = read_csv_file(input_file)
+    df = read_csv_file_sort(input_file)
 
     # Prepare a list to collect columns to be removed
     new_df = pd.DataFrame()
