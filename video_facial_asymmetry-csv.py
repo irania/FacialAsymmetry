@@ -66,9 +66,9 @@ def asymmetry_analyze(csv_name):
     data = load_data_from_single_csv(file_path)
 
     # Load model
-    loaded_clf = joblib.load('models/asymmetry_model_v2.pkl')
+    loaded_clf = joblib.load('models/asymmetry_model_v3.pkl')
     # Load selected features
-    selected_features = joblib.load('models/selected_features_v2.pkl')
+    selected_features = joblib.load('models/selected_features_v3.pkl')
 
     # Filter the prediction data to only include the features the model was trained on
     filtered_data = data[selected_features]

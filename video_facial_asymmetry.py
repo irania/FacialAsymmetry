@@ -61,41 +61,43 @@ def extract_distances(video_name, aligned_face_destination, image_files, csv_nam
 
 def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder,output_feature_folder,output_signal_folder):
     #extract video name
-    video_name= video_loc.split('/')[-1].split('.')[0]
+    video_name= video_loc.split('\\')[-1].split('.')[0]
     video_file= video_loc.split('/')[-1]
     video_loc = '/'.join(video_loc.split('/')[0:-1])
-    #step 1: crop and align face.
-    crop_align_face_single_video(video_file, video_loc, aligned_face_destination)
-    aligned_face_destination = os.path.join(aligned_face_destination, video_name)
-
-    #step 2: calculate asymmetry
-    image_files = [f for f in os.listdir(aligned_face_destination) if f.endswith(('.png', '.jpg', '.jpeg'))]  # Assuming these extensions, adjust as needed
-        
     csv_name = f"{video_name}-output.csv"
     csv_file = f"{output_distances_folder}/{csv_name}"  # Naming CSV file according to the sub-directory name
-    #if not os.path.exists(csv_file):
-        #extract_distances(video_name, aligned_face_destination, image_files, csv_file)
-        
+    if not os.path.exists(csv_file):
+        #step 1: crop and align face.
+        crop_align_face_single_video(video_file, video_loc, aligned_face_destination)
+        aligned_face_destination = os.path.join(aligned_face_destination, video_name)
+
+        #step 2: calculate asymmetry
+        image_files = [f for f in os.listdir(aligned_face_destination) if f.endswith(('.png', '.jpg', '.jpeg'))]  # Assuming these extensions, adjust as needed
+        extract_distances(video_name, aligned_face_destination, image_files, csv_file)
+            
     #step 3: extract features
+    file_path = f'{output_signal_folder}/signal_test_{csv_name}'
+    if(os.path.exists(file_path)):
+        return
     df = asymmetry_feature_extract(output_feature_folder, output_distances_folder, csv_name)
     df_to_signal(df,output_signal_folder, csv_name,'test')
         
     #step 4: predict
-    file_path = f'{output_signal_folder}/signal_test_{csv_name}'
+    
     data = load_data_from_single_csv(file_path)
 
     # Load model
-    loaded_clf = joblib.load('models/asymmetry_model.pkl')
+    loaded_clf = joblib.load('models/best_model_v3.pkl')
     # Load selected features
-    selected_features = joblib.load('models/selected_features.pkl')
+    selected_features = joblib.load('models/selected_features_v3.pkl')
 
     # Filter the prediction data to only include the features the model was trained on
     filtered_data = data[selected_features]
 
     # Make predictions
     predictions = loaded_clf.predict(filtered_data)
-    probabilities = loaded_clf.predict_proba(filtered_data)
-    return predictions, probabilities
+    #probabilities = loaded_clf.predict_proba(filtered_data)
+    return predictions, 100#probabilities
 
 
 logging.basicConfig(level=logging.INFO)
@@ -115,14 +117,17 @@ def process_video(video_path, aligned_face_destination, output_distances_folder,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Analyze video facial asymmetry.")
-    parser.add_argument("video_directory", help="Directory containing the video files.")
+    parser.add_argument("--video_directory", default='./data/web-base', help="Directory containing the video files.")
     # Example of adding another argument
-    parser.add_argument("--output_directory", default='./data/', help="Output directory for the processed data.")
+    parser.add_argument("--output_directory", default='./data', help="Output directory for the processed data.")
     args = parser.parse_args()
+    #video_directory = args.video_directory
+    video_directory = 'Z:\Video Assessment_Atefeh\\booth_txt_disgust'
+    #video_directory = 'Z:\Video Assessment_Atefeh\Facial Asymmetry\PD'
+    videos = glob.glob(os.path.join(video_directory, "*.mp4"))
 
-    videos = glob.glob(os.path.join(args.video_directory, "*.mp4"))
-
-    root_directory = args.output_directory
+    #root_directory = args.output_directory
+    root_directory = f'Z:\Video Assessment_Atefeh\Facial Asymmetry\csv'
     aligned_face_destination = os.path.join(root_directory,'aligned')
     output_distances_folder = os.path.join(root_directory,'csv-distance')
     output_feature_folder = os.path.join(root_directory,'csv-features')
