@@ -20,6 +20,9 @@ def extract_features(signal_data, name):
         'rms': np.sqrt(np.mean(signal_data ** 2)),
         'skewness': stats.skew(signal_data),
         'kurtosis': stats.kurtosis(signal_data),
+        'median': np.median(signal_data),
+        'max': np.max(signal_data),
+        'min': np.min(signal_data),
     }
         # Add catch22 features to the dictionary
     for idx, feature_name in enumerate(catch22_results['names']):

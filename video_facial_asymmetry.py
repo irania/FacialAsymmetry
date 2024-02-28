@@ -121,13 +121,13 @@ if __name__ == '__main__':
     # Example of adding another argument
     parser.add_argument("--output_directory", default='./data', help="Output directory for the processed data.")
     args = parser.parse_args()
-    #video_directory = args.video_directory
-    video_directory = 'Z:\Video Assessment_Atefeh\\booth_txt_disgust'
+    video_directory = args.video_directory
+    #video_directory = 'Z:\Video Assessment_Atefeh\\booth_txt_disgust'
     #video_directory = 'Z:\Video Assessment_Atefeh\Facial Asymmetry\PD'
-    videos = glob.glob(os.path.join(video_directory, "*.mp4"))
+    videos = glob.glob(os.path.join(video_directory, "*.webm"))
 
-    #root_directory = args.output_directory
-    root_directory = f'Z:\Video Assessment_Atefeh\Facial Asymmetry\csv'
+    root_directory = args.output_directory
+    #root_directory = f'Z:\Video Assessment_Atefeh\Facial Asymmetry\csv'
     aligned_face_destination = os.path.join(root_directory,'aligned')
     output_distances_folder = os.path.join(root_directory,'csv-distance')
     output_feature_folder = os.path.join(root_directory,'csv-features')
@@ -142,3 +142,10 @@ if __name__ == '__main__':
     
     for video_path in videos:
         process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)
+
+    # output_feature_folder = 'D:\Codes\Python\FacialAsymmetry\data\working\csv-features\PD'
+    # output_signal_folder = 'D:\Codes\Python\FacialAsymmetry\data\working\csv-signal\PD\\'
+    # csvs = glob.glob(os.path.join(output_feature_folder, "*.csv"))
+    # for csv in csvs:
+    #     df = pd.read_csv(csv)       
+    #     df_to_signal(df,output_signal_folder, csv.split('\\')[-1],'test')
