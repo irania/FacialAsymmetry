@@ -123,9 +123,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     video_directory = args.video_directory
     videos = glob.glob(os.path.join(video_directory, "*.mp4"))
-    print(videos)
+
     root_directory = args.output_directory
-    #root_directory = f'Z:\Video Assessment_Atefeh\Facial Asymmetry\csv'
+
     aligned_face_destination = os.path.join(root_directory,'aligned')
     output_distances_folder = os.path.join(root_directory,'csv-distance')
     output_feature_folder = os.path.join(root_directory,'csv-features')

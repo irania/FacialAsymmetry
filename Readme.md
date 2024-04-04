@@ -1,4 +1,4 @@
-[# Video Facial Asymmetry Analysis
+# Video Facial Asymmetry Analysis
 
 This project provides a solution to analyze facial asymmetry in videos of smiling individuals and predict the chance of Parkinson's disease. The software reads videos from a specified directory, processes each frame to detect and align faces, and subsequently computes asymmetry metrics. It leverages a pre-trained model from the UT-Parkinson dataset to make predictions and logs the results for each video.
 
@@ -29,4 +29,4 @@ This project provides a solution to analyze facial asymmetry in videos of smilin
 link: https://github.com/TadasBaltrusaitis/OpenFace/wiki/Windows-Installation
 
 ## Usage
-python video_facial_asymmetry.py \[path_to_videos_directory\] --output_directory \[path_to_output_directory\]](Readme.md)
+python video_facial_asymmetry.py \[path_to_videos_directory\] --output_directory \[path_to_output_directory\]
