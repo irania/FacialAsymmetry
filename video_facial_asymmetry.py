@@ -87,17 +87,17 @@ def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder
     data = load_data_from_single_csv(file_path)
 
     # Load model
-    loaded_clf = joblib.load('models/best_model_v3.pkl')
+    loaded_clf = joblib.load('models/best_model_v4.pkl')
     # Load selected features
-    selected_features = joblib.load('models/selected_features_v3.pkl')
+    selected_features = joblib.load('models/selected_features_v4.pkl')
 
     # Filter the prediction data to only include the features the model was trained on
     filtered_data = data[selected_features]
 
     # Make predictions
     predictions = loaded_clf.predict(filtered_data)
-    #probabilities = loaded_clf.predict_proba(filtered_data)
-    return predictions, 100#probabilities
+    probabilities = loaded_clf.predict_proba(filtered_data)
+    return predictions, probabilities
 
 
 logging.basicConfig(level=logging.INFO)
@@ -122,10 +122,8 @@ if __name__ == '__main__':
     parser.add_argument("--output_directory", default='./data', help="Output directory for the processed data.")
     args = parser.parse_args()
     video_directory = args.video_directory
-    #video_directory = 'Z:\Video Assessment_Atefeh\\booth_txt_disgust'
-    #video_directory = 'Z:\Video Assessment_Atefeh\Facial Asymmetry\PD'
-    videos = glob.glob(os.path.join(video_directory, "*.webm"))
-
+    videos = glob.glob(os.path.join(video_directory, "*.mp4"))
+    print(videos)
     root_directory = args.output_directory
     #root_directory = f'Z:\Video Assessment_Atefeh\Facial Asymmetry\csv'
     aligned_face_destination = os.path.join(root_directory,'aligned')
@@ -141,11 +139,5 @@ if __name__ == '__main__':
     ensure_directory_exists(output_signal_folder)
     
     for video_path in videos:
+        print(video_path)
         process_video(video_path, aligned_face_destination, output_distances_folder, output_feature_folder, output_signal_folder)
-
-    # output_feature_folder = 'D:\Codes\Python\FacialAsymmetry\data\working\csv-features\PD'
-    # output_signal_folder = 'D:\Codes\Python\FacialAsymmetry\data\working\csv-signal\PD\\'
-    # csvs = glob.glob(os.path.join(output_feature_folder, "*.csv"))
-    # for csv in csvs:
-    #     df = pd.read_csv(csv)       
-    #     df_to_signal(df,output_signal_folder, csv.split('\\')[-1],'test')
