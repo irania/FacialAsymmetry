@@ -72,7 +72,7 @@ def asymmetry_analyze(video_loc,aligned_face_destination,output_distances_folder
         aligned_face_destination = os.path.join(aligned_face_destination, video_name)
 
         #step 2: calculate asymmetry
-        image_files = [f for f in os.listdir(aligned_face_destination) if f.endswith(('.png', '.jpg', '.jpeg'))]  # Assuming these extensions, adjust as needed
+        image_files = [f for f in os.listdir(aligned_face_destination) if f.endswith(('.png', '.jpg', '.jpeg'))] 
         extract_distances(video_name, aligned_face_destination, image_files, csv_file)
             
     #step 3: extract features
