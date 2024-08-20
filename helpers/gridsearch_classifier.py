@@ -7,7 +7,6 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
 from sklearn.model_selection import GroupKFold
 import pandas as pd
 
@@ -18,7 +17,7 @@ classifiers = {
     'KNeighborsClassifier': KNeighborsClassifier(),
     'RandomForestClassifier': RandomForestClassifier(),
     'LogisticRegression': LogisticRegression(),
-    'XGBClassifier': XGBClassifier( eval_metric='mlogloss')
+#    'XGBClassifier': XGBClassifier( eval_metric='mlogloss')
 }
 
 param_grids = {

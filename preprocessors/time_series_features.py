@@ -10,10 +10,15 @@ def extract_features(signal_data, name):
     # Calculate catch22 features
     catch22_results = catch22_all(signal_data)
     catch22_features = catch22_results['values']
-    
+    signal_data = np.array(signal_data-signal_data[0])
     features = {
         'name': name,
         'amplitude': np.max(signal_data) - np.min(signal_data),
+        'IQR': np.percentile(signal_data,75) - np.percentile(signal_data, 25),
+        'IQRm':np.percentile(signal_data,90) - np.percentile(signal_data, 10),
+        'IQRn': np.percentile(signal_data,95) - np.percentile(signal_data, 5),
+        'IQRt': np.percentile(signal_data,98) - np.percentile(signal_data, 2),
+        'IQRf': np.percentile(signal_data,95),
         'mean': np.mean(signal_data),
         'variance': np.var(signal_data),
         'standard_deviation': np.std(signal_data),
@@ -23,6 +28,7 @@ def extract_features(signal_data, name):
         'median': np.median(signal_data),
         'max': np.max(signal_data),
         'min': np.min(signal_data),
+        
     }
         # Add catch22 features to the dictionary
     for idx, feature_name in enumerate(catch22_results['names']):
@@ -59,14 +65,15 @@ def AUs_to_signal_features(output_folder, input_folder, filename):
 
 
 if __name__ == '__main__':
-    group_name = 'HC'
-    input_folder = f'./csv/asymmetry-featured/{group_name}/'
-    output_folder = f'./csv/asymmetry-signal/smile/{group_name}/'
-    # List all files in the folder
+    for group_name in ['PD', 'HC']:
+        input_folder = f'./data/working/csv-features/{group_name}/'
+        output_folder = f'./data/working/csv-new-signal/{group_name}/'
+        # List all files in the folder
 
-    for filename in os.listdir(input_folder):
-        file_path = os.path.join(input_folder, filename)
+        for filename in os.listdir(input_folder):
+            file_path = os.path.join(input_folder, filename)
 
-        # Check if the path is a file
-        if os.path.isfile(file_path) and not os.path.isfile(f'{output_folder}signal_{group_name}_{filename}'):
-            AUs_to_signal_features(output_folder, input_folder, filename)
+            # Check if the path is a file
+            if os.path.isfile(file_path): 
+                #and not os.path.isfile(f'{output_folder}signal_{group_name}_{filename}'):
+                AUs_to_signal_features(output_folder, input_folder, filename)
