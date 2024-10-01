@@ -1,13 +1,13 @@
 # Video Facial Asymmetry Analysis
 
-This project provides a solution to analyze facial asymmetry in videos of smiling individuals and predict the chance of Parkinson's disease. The software reads videos from a specified directory, processes each frame to detect and align faces, and subsequently computes asymmetry metrics. It leverages a pre-trained model from the UT-Parkinson dataset to make predictions and logs the results for each video.
-
+This project provides a solution to analyze facial asymmetry in videos of smiling individuals and predict the chance of Parkinson's disease. The software reads videos from a specified directory, processes each frame to detect and align faces, and subsequently computes asymmetry metrics. 
 
 ## Requirements
 - Python 3.x
 - Libraries: joblib, numpy, pandas, os, pytorch
 - Videos should be in the `.mp4` format.
 
+![Processing figure](http://url/to/img.png)
 
 ## Setup
 
